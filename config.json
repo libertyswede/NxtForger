@@ -1,0 +1,4 @@
+{
+    "ServerUri": "http://node1.ardorcrypto.com:7876/nxt",
+    "SleepTime": "10000"
+}

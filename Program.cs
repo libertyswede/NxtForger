@@ -6,18 +6,23 @@ using System.Threading;
 using System;
 using System.Linq;
 using NxtLib.Blocks;
+using Microsoft.Extensions.PlatformAbstractions;
+using Microsoft.Extensions.Configuration;
 
 namespace NxtForger
 {
     public class Program
     {
-        private const string server = "http://localhost:7876/nxt";
+        private static string server;
+        private static int sleepTime;
         private static ulong lastBlockId = Constants.GenesisBlockId;
         private static List<GetNextBlockGeneratorsReply> projectedGenerators = new List<GetNextBlockGeneratorsReply>();
         private static ServerInfoService serverInfoService;
 
         public static void Main(string[] args)
         {
+            ReadConfig();
+
             serverInfoService = new ServerInfoService(server);
             var forgingService = new ForgingService(server);
             lastBlockId = Constants.GenesisBlockId;
@@ -42,7 +47,7 @@ namespace NxtForger
                 }
                 else
                 {
-                    Thread.Sleep(1000);
+                    Thread.Sleep(sleepTime);
                 }
             }
         }
@@ -77,6 +82,17 @@ namespace NxtForger
                 Console.WriteLine($"Expected block {nextBlockGeneratorReply.LastBlockId} at height {height} was rolled back, skipping.");
             }
             projectedGenerators.RemoveAt(0);
+        }
+
+        private static void ReadConfig()
+        {
+            var configBuilder = new ConfigurationBuilder();
+            configBuilder.SetBasePath(PlatformServices.Default.Application.ApplicationBasePath);
+            configBuilder.AddJsonFile("config.json");
+            configBuilder.AddJsonFile("config-Development.json", true);
+            var config = configBuilder.Build();
+            server = config.GetChildren().Single(c => c.Key == "ServerUri").Value;
+            sleepTime = int.Parse(config.GetChildren().Single(c => c.Key == "SleepTime").Value);
         }
     }
 }

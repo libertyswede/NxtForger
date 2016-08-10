@@ -2,10 +2,15 @@
   "version": "1.0.0-*",
   "buildOptions": {
     "debugType": "portable",
-    "emitEntryPoint": true
+    "emitEntryPoint": true,
+    "copyToOutput": ["config.json", "config-Development.json"]
   },
   "dependencies": {
-    "NxtLib": "1.1.20"
+    "NxtLib": "1.1.20",
+    "Microsoft.Extensions.PlatformAbstractions": "1.0.0",
+    "Microsoft.Extensions.Configuration": "1.0.0",
+    "Microsoft.Extensions.Configuration.FileExtensions": "1.0.0",
+    "Microsoft.Extensions.Configuration.Json": "1.0.0"
   },
   
   "frameworks": {
