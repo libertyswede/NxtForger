@@ -63,7 +63,8 @@ namespace NxtForger
             if (block.BlockId == nextBlockGeneratorReply.LastBlockId)
             {
                 var generatedBlock = blockService.GetBlock(BlockLocator.ByHeight(height + 1)).Result;
-                var expectedAccountRs = nextBlockGeneratorReply.Generators.First().AccountRs;
+                var generatorsOrdered = nextBlockGeneratorReply.Generators.OrderBy(g => g.HitTime).ToList();
+                var expectedAccountRs = generatorsOrdered.First().AccountRs;
                 var actualAccountRs = generatedBlock.GeneratorRs;
 
                 if (expectedAccountRs == actualAccountRs)
@@ -72,9 +73,11 @@ namespace NxtForger
                 }
                 else
                 {
-                    var expectedGenerator = nextBlockGeneratorReply.Generators.SingleOrDefault(g => g.AccountRs == expectedAccountRs);
-                    var index = expectedGenerator != null ? nextBlockGeneratorReply.Generators.IndexOf(expectedGenerator) : -1;
-                    Console.WriteLine($"Unexpected at height: {height + 1} expected: {expectedAccountRs} but got: {actualAccountRs} at index: {index}");
+                    var expectedGenerator = generatorsOrdered.Single(g => g.AccountRs == expectedAccountRs);
+                    var actualGenerator = generatorsOrdered.SingleOrDefault(g => g.AccountRs == actualAccountRs);
+                    var index = actualGenerator != null ? generatorsOrdered.IndexOf(actualGenerator) : -1;
+                    Console.WriteLine($"Unexpected generator at height: {height + 1} for block id: {generatedBlock.BlockId}");
+                    Console.WriteLine($"Expected: {expectedAccountRs} HitTime: {expectedGenerator.HitTime} but got: {actualAccountRs} HitTime: {actualGenerator.HitTime} at index: {index}");
                 }
             }
             else
