@@ -20,10 +20,10 @@ namespace NxtForger
         {
             serverInfoService = new ServerInfoService(server);
             var forgingService = new ForgingService(server);
+            lastBlockId = Constants.GenesisBlockId;
 
             var blockchainStatus = serverInfoService.GetBlockchainStatus().Result;
-            lastBlockId = blockchainStatus.LastBlockId;
-            Console.WriteLine($"Starting NxtForger check @ height {blockchainStatus.NumberOfBlocks - 1}");
+            Console.WriteLine($"{DateTime.Now} Starting NxtForger check @ height {blockchainStatus.NumberOfBlocks - 1}");
 
             while (true)
             {
@@ -42,7 +42,7 @@ namespace NxtForger
                 }
                 else
                 {
-                    Thread.Sleep(10000);
+                    Thread.Sleep(10 * 1000);
                 }
             }
         }
@@ -54,13 +54,13 @@ namespace NxtForger
             var nextBlockGeneratorReply = projectedGenerators.First();
             var height = nextBlockGeneratorReply.Height;
             var block = blockService.GetBlock(BlockLocator.ByHeight(height)).Result;
-            var generatedBlock = blockService.GetBlock(BlockLocator.ByHeight(height + 1)).Result;
-            
-            var expectedGenerator = nextBlockGeneratorReply.Generators.First().AccountRs;
-            var actualGenerator = generatedBlock.GeneratorRs;
 
             if (block.BlockId == nextBlockGeneratorReply.LastBlockId)
             {
+                var generatedBlock = blockService.GetBlock(BlockLocator.ByHeight(height + 1)).Result;
+                var expectedGenerator = nextBlockGeneratorReply.Generators.First().AccountRs;
+                var actualGenerator = generatedBlock.GeneratorRs;
+
                 if (expectedGenerator == actualGenerator)
                 {
                     Console.WriteLine($"Expected generator generated block at height: {height + 1} id: {generatedBlock.BlockId}");
@@ -74,7 +74,7 @@ namespace NxtForger
             }
             else
             {
-                Console.WriteLine($"Block {nextBlockGeneratorReply.LastBlockId} at height {height} was rolled back, skipping.");
+                Console.WriteLine($"Expected block {nextBlockGeneratorReply.LastBlockId} at height {height} was rolled back, skipping.");
             }
             projectedGenerators.RemoveAt(0);
         }
