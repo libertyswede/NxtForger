@@ -23,6 +23,7 @@ namespace NxtForger
 
             var blockchainStatus = serverInfoService.GetBlockchainStatus().Result;
             lastBlockId = blockchainStatus.LastBlockId;
+            Console.WriteLine($"Starting NxtForger check @ height {blockchainStatus.NumberOfBlocks - 1}");
 
             while (true)
             {
