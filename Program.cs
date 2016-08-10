@@ -51,22 +51,29 @@ namespace NxtForger
             var blockService = new BlockService(server);
 
             var nextBlockGeneratorReply = projectedGenerators.First();
-            var height = nextBlockGeneratorReply.Height + 1;
+            var height = nextBlockGeneratorReply.Height;
             var block = blockService.GetBlock(BlockLocator.ByHeight(height)).Result;
+            var generatedBlock = blockService.GetBlock(BlockLocator.ByHeight(height + 1)).Result;
             
-            var expectedGenerator = nextBlockGeneratorReply.Generators.First().AccountId;
-            var actualGenerator = block.Generator;
+            var expectedGenerator = nextBlockGeneratorReply.Generators.First().AccountRs;
+            var actualGenerator = generatedBlock.GeneratorRs;
 
-            if (expectedGenerator == actualGenerator)
+            if (block.BlockId == nextBlockGeneratorReply.LastBlockId)
             {
-                Console.WriteLine($"Expected generator generated block at height {height}");
+                if (expectedGenerator == actualGenerator)
+                {
+                    Console.WriteLine($"Expected generator generated block at height: {height + 1} id: {generatedBlock.BlockId}");
+                }
+                else
+                {
+                    var generator = nextBlockGeneratorReply.Generators.SingleOrDefault(g => g.AccountRs == expectedGenerator);
+                    var index = generator != null ? nextBlockGeneratorReply.Generators.IndexOf(generator) : -1;
+                    Console.WriteLine($"Unexpected generator generated block at height: {height + 1} expected: {expectedGenerator} but got: {actualGenerator} at index: {index}");
+                }
             }
             else
             {
-                var generator = nextBlockGeneratorReply.Generators.SingleOrDefault(g => g.AccountId == expectedGenerator);
-                var index = generator != null ? nextBlockGeneratorReply.Generators.IndexOf(generator) : -1;
-                Console.Write($"Unexpected generator generated block at height {height}, expected: {expectedGenerator} but got {actualGenerator} ");
-                Console.WriteLine($"at index {index}");
+                Console.WriteLine($"Block {nextBlockGeneratorReply.LastBlockId} at height {height} was rolled back, skipping.");
             }
             projectedGenerators.RemoveAt(0);
         }
