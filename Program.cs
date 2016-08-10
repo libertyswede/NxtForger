@@ -11,7 +11,7 @@ namespace NxtForger
 {
     public class Program
     {
-        private const string server = "http://node1.ardorcrypto.com:7876/nxt";
+        private const string server = "http://localhost:7876/nxt";
         private static ulong lastBlockId = Constants.GenesisBlockId;
         private static List<GetNextBlockGeneratorsReply> projectedGenerators = new List<GetNextBlockGeneratorsReply>();
         private static ServerInfoService serverInfoService;
@@ -42,7 +42,7 @@ namespace NxtForger
                 }
                 else
                 {
-                    Thread.Sleep(10 * 1000);
+                    Thread.Sleep(1000);
                 }
             }
         }
