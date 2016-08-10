@@ -1,13 +1,13 @@
-﻿using NxtLib.Forging;
-using NxtLib.ServerInfo;
-using NxtLib.Local;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
 using System;
 using System.Linq;
-using NxtLib.Blocks;
 using Microsoft.Extensions.PlatformAbstractions;
 using Microsoft.Extensions.Configuration;
+using NxtLib.Forging;
+using NxtLib.ServerInfo;
+using NxtLib.Local;
+using NxtLib.Blocks;
 
 namespace NxtForger
 {
@@ -63,18 +63,18 @@ namespace NxtForger
             if (block.BlockId == nextBlockGeneratorReply.LastBlockId)
             {
                 var generatedBlock = blockService.GetBlock(BlockLocator.ByHeight(height + 1)).Result;
-                var expectedGenerator = nextBlockGeneratorReply.Generators.First().AccountRs;
-                var actualGenerator = generatedBlock.GeneratorRs;
+                var expectedAccountRs = nextBlockGeneratorReply.Generators.First().AccountRs;
+                var actualAccountRs = generatedBlock.GeneratorRs;
 
-                if (expectedGenerator == actualGenerator)
+                if (expectedAccountRs == actualAccountRs)
                 {
-                    Console.WriteLine($"Expected generator generated block at height: {height + 1} id: {generatedBlock.BlockId}");
+                    Console.WriteLine($"Expected at height: {height + 1} id: {generatedBlock.BlockId}");
                 }
                 else
                 {
-                    var generator = nextBlockGeneratorReply.Generators.SingleOrDefault(g => g.AccountRs == expectedGenerator);
-                    var index = generator != null ? nextBlockGeneratorReply.Generators.IndexOf(generator) : -1;
-                    Console.WriteLine($"Unexpected generator generated block at height: {height + 1} expected: {expectedGenerator} but got: {actualGenerator} at index: {index}");
+                    var expectedGenerator = nextBlockGeneratorReply.Generators.SingleOrDefault(g => g.AccountRs == expectedAccountRs);
+                    var index = expectedGenerator != null ? nextBlockGeneratorReply.Generators.IndexOf(expectedGenerator) : -1;
+                    Console.WriteLine($"Unexpected at height: {height + 1} expected: {expectedAccountRs} but got: {actualAccountRs} at index: {index}");
                 }
             }
             else
