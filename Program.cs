@@ -77,7 +77,7 @@ namespace NxtForger
                     var actualGenerator = generatorsOrdered.SingleOrDefault(g => g.AccountRs == actualAccountRs);
                     var index = actualGenerator != null ? generatorsOrdered.IndexOf(actualGenerator) : -1;
                     Console.WriteLine($"Unexpected generator at height: {height + 1} for block id: {generatedBlock.BlockId}");
-                    Console.WriteLine($"Expected: {expectedAccountRs} Deadline: {expectedGenerator.Deadline} but got: {actualAccountRs} Deadline: {actualGenerator.Deadline} at index: {index}");
+                    Console.WriteLine($"Expected: {expectedAccountRs} Deadline: {expectedGenerator.Deadline} but got: {actualAccountRs} Deadline: {actualGenerator?.Deadline} at index: {index}");
                 }
             }
             else
